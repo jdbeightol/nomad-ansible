@@ -1,0 +1,36 @@
+---
+- name: check if nomad is installed
+  stat:
+    path: "/usr/local/nomad/{{ nomad_version }}/nomad"
+  register: nomad_bin
+- name: download and install nomad
+  when: not nomad_bin.stat.exists
+  block:
+    - name: download nomad archive
+      become: yes
+      get_url:
+        url: "{{ hashicorp_address }}/nomad/{{ nomad_version }}/{{ nomad_archive_file }}"
+        dest: "/tmp/{{ nomad_archive_file }}"
+        mode: '0644'
+    - name: create nomad diretory
+      become: yes
+      file:
+        state: directory
+        dest: "/usr/local/nomad/{{ nomad_version }}"
+        mode: "0755"
+    - name: extract nomad archive
+      become: yes
+      unarchive:
+        src: "/tmp/{{ nomad_archive_file }}"
+        dest: "/usr/local/nomad/{{ nomad_version }}/"
+        remote_src: yes
+      notify:
+        - restart nomad
+- name: link nomad binary
+  become: yes
+  file:
+    state: link
+    src: "/usr/local/nomad/{{ nomad_version }}/nomad"
+    dest: /usr/local/bin/nomad
+  notify:
+    - restart nomad

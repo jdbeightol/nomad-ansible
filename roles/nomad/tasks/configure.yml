@@ -1,0 +1,59 @@
+---
+- name: create nomad data diretory
+  become: yes
+  file:
+    state: directory
+    dest: /opt/nomad
+    owner: root
+    group: root
+    mode: "0700"
+- name: create nomad config diretory
+  become: yes
+  file:
+    state: directory
+    dest: /etc/nomad.d
+    owner: root
+    group: root
+    mode: "0755"
+- name: create nomad config
+  become: yes
+  template:
+    src: templates/nomad.hcl.jinja
+    dest: /etc/nomad.d/nomad.hcl
+    owner: root
+    group: root
+    mode: "0640"
+  notify:
+    - restart nomad
+- name: create nomad host volumes
+  become: yes
+  file:
+    path: " {{ nomad_volume_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: nomad_host_volumes is defined
+- name: create nomad host volumes
+  become: yes
+  file:
+    path: "{{ nomad_volume_dir }}/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop: "{{ nomad_host_volumes }}"
+  when: nomad_host_volumes is defined
+- name: set vm.max_map_count
+  become: yes
+  block:
+    - ansible.posix.sysctl:
+        name: vm.max_map_count
+        value: 262144
+        state: present
+        reload: True
+
+- name: add the iptable_raw module
+  community.general.modprobe:
+    name: iptable_raw
+    state: present

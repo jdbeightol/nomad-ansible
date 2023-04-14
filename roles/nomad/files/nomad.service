@@ -1,0 +1,15 @@
+[Unit]
+Description=nomad agent
+Documentation=https://www.nomadproject.io/docs
+Requires=consul.service
+After=consul.service
+
+[Service]
+User=root
+WorkingDirectory=/opt/nomad
+Restart=on-failure
+ExecStart=/usr/local/bin/nomad agent -config /etc/nomad.d
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

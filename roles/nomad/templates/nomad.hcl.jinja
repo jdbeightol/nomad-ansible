@@ -1,0 +1,46 @@
+data_dir  = "/opt/nomad"
+datacenter = "{{ nomad_datacenter }}"
+region = "{{ nomad_region }}"
+bind_addr = "{{ nomad_bind_address }}"
+{% if nomad_advertise_address is defined %}
+advertise = {
+  http = "{{ nomad_advertise_address }}"
+  rpc = "{{ nomad_advertise_address }}"
+  serf = "{{ nomad_advertise_address }}"
+}
+{% endif %}
+{% if nomad_server %}
+server {
+  enabled = true
+  bootstrap_expect = {{ nomad_bootstrap_expect }}
+}
+{% endif %}
+{% if nomad_client %}
+client {
+  enabled = true
+{% if nomad_host_volumes is defined %}
+
+{% for vol in nomad_host_volumes %}
+  host_volume "{{ vol }}" {
+    path = "{{ nomad_volume_dir }}/{{ vol }}"
+  }
+{% endfor %}
+{% endif %}
+}
+{% endif %}
+{% if nomad_consul_address is defined %}
+consul {
+  address = "{{ nomad_consul_address }}:8500"
+}
+{% endif %}
+
+{% if nomad_vault_token is defined and nomad_vault_address is defined %}
+vault {
+  enabled = true
+  address = "{{ nomad_vault_address }}"
+{% if nomad_server %}
+  token            = "{{ nomad_vault_token }}"
+  create_from_role = "{{ nomad_vault_role }}"
+{% endif %}
+}
+{% endif %}

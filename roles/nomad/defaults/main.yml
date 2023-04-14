@@ -1,0 +1,12 @@
+---
+hashicorp_address: https://releases.hashicorp.com
+
+nomad_bind_address: "0.0.0.0"
+nomad_bootstrap_expect: 1
+nomad_client: false
+nomad_datacenter: local
+nomad_region: global
+nomad_server: false
+nomad_volume_dir: /opt/nomad/volumes
+
+nomad_cni_version: v1.0.0

@@ -1,0 +1,22 @@
+---
+- name: install nomad
+  import_tasks: install.yml
+  vars:
+    - nomad_archive_file: "nomad_{{ nomad_version }}_linux_{{ {'armv7l': 'armhfv6', 'armv6l': 'armelv5', 'x86_64': 'amd64'}[ansible_architecture] | default('386') }}.zip"
+- name: configure nomad
+  import_tasks: configure.yml
+- name: create nomad service
+  become: yes
+  copy:
+    src: files/nomad.service
+    dest: /etc/systemd/system/nomad.service
+    mode: '0644'
+  notify:
+    - restart nomad
+- name: start nomad service
+  become: yes
+  systemd:
+    name: nomad
+    state: started
+    enabled: yes
+    daemon_reload: yes
