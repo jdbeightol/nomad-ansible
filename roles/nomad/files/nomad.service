@@ -1,8 +1,6 @@
 [Unit]
 Description=nomad agent
 Documentation=https://www.nomadproject.io/docs
-Requires=consul.service
-After=consul.service
 
 [Service]
 User=root

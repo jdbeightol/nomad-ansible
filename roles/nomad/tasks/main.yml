@@ -1,4 +1,10 @@
 ---
+- name: install dependencies
+  become: yes
+  apt:
+    name: unzip
+    state: present
+    update_cache: yes
 - name: install nomad
   import_tasks: install.yml
   vars:
