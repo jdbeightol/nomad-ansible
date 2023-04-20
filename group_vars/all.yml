@@ -1,0 +1,3 @@
+---
+nomad_bootstrap_expect: 3
+nomad_version: 1.5.2
